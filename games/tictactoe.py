@@ -4,7 +4,7 @@ import random
 class TicTacToeGame:
     def __init__(self):
         self.window = tk.Toplevel()
-        self.window.title("❌ Tic Tac Toe ⭕ (vs AI)")
+        self.window.title("Tic Tac Toe")
         self.window.resizable(False, False)
 
         self.player = "X"
@@ -42,7 +42,6 @@ class TicTacToeGame:
                 self.window.after(500, self.ai_move)
 
     def ai_move(self):
-        # Simple AI: Win if possible, block player, pick random
         for i in range(9):
             if self.board[i] == "":
                 self.board[i] = self.ai
