@@ -9,7 +9,7 @@ SPEED = 100
 class SnakeGame:
     def __init__(self):
         self.window = tk.Toplevel()
-        self.window.title("🐍 Snake")
+        self.window.title("Snake")
         self.window.resizable(False, False)
 
         self.canvas = tk.Canvas(self.window, width=CANVAS_WIDTH, height=CANVAS_HEIGHT, bg="#1f1f1f")

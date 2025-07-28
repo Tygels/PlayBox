@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
-from games import snake
+from games import snake, tictactoe
 
 class PlayBoxApp:
     def __init__(self, root):
@@ -14,6 +14,9 @@ class PlayBoxApp:
 
         btn_snake = tk.Button(root, text="Play Snake", command=snake.launch_game, width=20, height=2, bg="#1f1f1f", fg="white")
         btn_snake.pack(pady=10)
+
+        btn_ttt = tk.Button(root, text="Play Tic Tac Toe", command=tictactoe.launch_game, width=20, height=2, bg="#1f1f1f", fg="white")
+        btn_ttt.pack(pady=10)
 
         quit_btn = tk.Button(root, text="Exit", command=root.quit, width=10, bg="#ff1744", fg="white")
         quit_btn.pack(side="bottom", pady=20)
