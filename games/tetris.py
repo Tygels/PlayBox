@@ -4,7 +4,7 @@ import random
 CELL_SIZE = 30
 COLUMNS = 10
 ROWS = 20
-SPEED = 500  # milliseconds
+SPEED = 500
 
 SHAPES = {
     'I': [[1, 1, 1, 1]],
@@ -30,17 +30,38 @@ class TetrisGame:
     def __init__(self):
         self.window = tk.Toplevel()
         self.window.title("Tetris")
+
+        self.score = 0
+        self.running = False
         self.canvas = tk.Canvas(self.window, width=CELL_SIZE*COLUMNS, height=CELL_SIZE*ROWS, bg="#121212")
         self.canvas.pack()
+
+        self.score_label = tk.Label(self.window, text="Score: 0", font=("Segoe UI", 14), bg="#121212", fg="#00e676")
+        self.score_label.pack(pady=5)
+
+        self.start_btn = tk.Button(self.window, text="Start Game", command=self.start_game, bg="#00e676", fg="black")
+        self.start_btn.pack(pady=10)
+
         self.window.bind("<Key>", self.handle_key)
 
         self.board = [[None for _ in range(COLUMNS)] for _ in range(ROWS)]
-        self.running = True
-        self.current = None
+        self.shape = None
+        self.shape_type = ''
+        self.color = ''
         self.current_pos = (0, 3)
 
+    def start_game(self):
+        self.start_btn.pack_forget()
+        self.score = 0
+        self.update_score(0)
+        self.board = [[None for _ in range(COLUMNS)] for _ in range(ROWS)]
+        self.running = True
         self.spawn_piece()
         self.game_loop()
+
+    def update_score(self, lines_cleared):
+        self.score += lines_cleared * 100
+        self.score_label.config(text=f"Score: {self.score}")
 
     def spawn_piece(self):
         self.shape_type = random.choice(list(SHAPES.keys()))
@@ -74,11 +95,17 @@ class TetrisGame:
         self.spawn_piece()
 
     def clear_lines(self):
-        new_board = [row for row in self.board if any(cell is None for cell in row)]
-        cleared = ROWS - len(new_board)
+        new_board = []
+        cleared = 0
+        for row in self.board:
+            if all(cell is not None for cell in row):
+                cleared += 1
+            else:
+                new_board.append(row)
         for _ in range(cleared):
             new_board.insert(0, [None for _ in range(COLUMNS)])
         self.board = new_board
+        self.update_score(cleared)
 
     def move(self, drow, dcol):
         new_pos = (self.current_pos[0] + drow, self.current_pos[1] + dcol)
@@ -108,19 +135,18 @@ class TetrisGame:
     def draw_board(self):
         self.canvas.delete("all")
 
-        # Draw existing blocks
         for r in range(ROWS):
             for c in range(COLUMNS):
                 color = self.board[r][c]
                 if color:
                     self.draw_cell(r, c, color)
 
-        # Draw falling block
-        row, col = self.current_pos
-        for r in range(len(self.shape)):
-            for c in range(len(self.shape[0])):
-                if self.shape[r][c]:
-                    self.draw_cell(row + r, col + c, self.color)
+        if self.running and self.shape:
+            row, col = self.current_pos
+            for r in range(len(self.shape)):
+                for c in range(len(self.shape[0])):
+                    if self.shape[r][c]:
+                        self.draw_cell(row + r, col + c, self.color)
 
     def draw_cell(self, row, col, color):
         x1 = col * CELL_SIZE
@@ -132,14 +158,8 @@ class TetrisGame:
     def game_over(self):
         self.running = False
         self.canvas.create_text(CELL_SIZE*COLUMNS//2, CELL_SIZE*ROWS//2, text="Game Over", fill="white", font=("Segoe UI", 24))
-        btn = tk.Button(self.window, text="Try Again", command=self.restart, bg="#00e676", fg="black")
+        btn = tk.Button(self.window, text="Try Again", command=self.start_game, bg="#00e676", fg="black")
         self.canvas.create_window(CELL_SIZE*COLUMNS//2, CELL_SIZE*ROWS//2 + 40, window=btn)
-
-    def restart(self):
-        self.board = [[None for _ in range(COLUMNS)] for _ in range(ROWS)]
-        self.running = True
-        self.spawn_piece()
-        self.game_loop()
 
     def game_loop(self):
         if self.running:
@@ -149,4 +169,3 @@ class TetrisGame:
 
 def launch_game():
     TetrisGame()
-
